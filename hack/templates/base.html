@@ -1,64 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>
-        {% block title %}
-            
-        {% endblock %} - AppName
-    </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>stratify.</title>
 </head>
+
+<style>
+  * {
+    font-family: 'Inter' !important;
+  }
+</style>
+
 <body>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="/">AppName</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
+  <header class="bg-white bg-opacity-5 hidden md:block antialiased">
+    <div class="container mx-auto flex items-center h-24">
+      <a href="/" class="font-semibold text-lg flex items-center justify-center ml-4 text-[#10172A]">
+        stratify.
+      </a>
+      <nav class="contents font-medium text-base lg:text-lg">
+        <ul class="mx-auto flex items-center">
+          <li class="p-5 xl:p-8 ">
+            <a href="/" class="inline-flex items-center justify-center rounded-2xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-200 p-4">
+              <span>home</span>
+            </a>
+          </li>
+          <li class="p-5 xl:p-8">
+            <a href="/pricing" class="inline-flex items-center justify-center rounded-2xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-200 p-4">
+              <span>pricing</span>
+            </a>
+          </li>
+          <li class="p-5 xl:p-8">
+            <a href="/faq" class="inline-flex items-center justify-center rounded-2xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-200 p-4">
+              <span>FAQ</span>
+            </a>
           </li>
         </ul>
-          {% if current_user.is_authenticated %}
-          <text class="me-4">Current plan: {{current_user.membership}}</a>
-          <a class="btn btn-outline-danger" href="/logout">Logout</a>
-          {% else %}
-          <a class="btn btn-outline-success me-2" href="/login">Login</a>
-          <a class="btn btn-outline-success" href="/reg">Register</a>
+      </nav>
+      {% if not current_user.is_authenticated %}
+      <a href="/login"
+        class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">sign
+        in</a>
+      <a href="/reg"
+        class="border-2 border-white bg-[#10172A] text-white hover:border-[#10172A] rounded-2xl hover:bg-white hover:text-[#10172A] transition-all 2s font-medium px-8 py-2 mr-4">sign
+        up</a>
+      {% else %}
+      <div class="relative group inline-block text-left">
+        <button @click="open = !open" id="user-menu-button" class="rounded-full p-2">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-10 h-10 outline p-2 rounded-full outline-gray-200"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>        
+        <ul x-show="open" @click.away="open = false" class="opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all 2s absolute left-0 z-10 mt-2 w-32 origin-top-right bg-white border border-gray-300 rounded-lg shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none" id="user-menu" role="listbox" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+          {% if current_user.subPlan == 'Free' %}
+          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
+            <a href="/billing">Upgrade</a>
+          </li>
+          {% elif current_user.subPlan == 'Pro' %}
+          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
+            <a href="/billing">Manage Subscription</a>
+          </li>
           {% endif %}
+          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
+            <a href="/dashboard">Dashboard</a>
+          </li>
+          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
+            <a href="/logout">Sign Out</a>
+          </li>
+        </ul>
       </div>
-    </div>
-  </nav>
-    {% block content %}
-        
-    {% endblock %}
-    {% with messages = get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-        {% for category, message in messages %}
-        {% if category == "error" %}
-        <div class="alert alert-danger alter-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% else %}
-        <div class="alert alert-success alter-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endif %}
-
-        {% endfor %}
       {% endif %}
-    {% endwith %}
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+    </div>
+  </header>
+  <div id="flash-toast" class="fixed inset-x-0 bottom-10 flex justify-center items-center opacity-0">
+    <div class="bg-white border border-gray-300 p-4 rounded-lg shadow-md">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          var toast = document.getElementById("flash-toast");
+
+          // Show the toast with a smooth fade-in effect
+          toast.style.opacity = 1;
+
+          // After 5 seconds, hide the toast with a smooth fade-out effect
+          setTimeout(function () {
+            toast.style.opacity = 0;
+          }, 5000);
+        });
+      </script>
+      {% for category, message in messages %}
+      <div class="mb-2">
+        <div class="font-bold {% if category == 'error' %}text-red-500{% else %}text-green-500{% endif %}">
+          {% if category == 'error' %}Error{% else %}Success{% endif %}
+        </div>
+        <div>{{ message }}</div>
+      </div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+  {% block content %}
+
+  {% endblock content %}
 </body>
+
 </html>

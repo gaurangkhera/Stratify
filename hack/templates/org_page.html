@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class='mx-auto max-w-7xl md:p-10'>
+    <div class='mt-4 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0'>
+      <h1 class='mb-3 font-bold text-5xl text-gray-900 heading'>
+        {{org.name}}
+      </h1>
+
+      {% if current_user.id != org.leader_id %}
+      <button href="/dashboard/org/{{org.id}}/create-sub-org" class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
+        create sub-organisations
+      </button>
+      {% else %}
+      <a href="/dashboard/org/{{org.id}}/create-sub-org" class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">
+        create sub-organisations
+      </a>
+      {% endif %}
+    </div>
+    <ul class='mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3'>
+    {% for i in orgs %}
+        <li class="ol-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg">
+            <a
+                  href="/dashboard/org/{{org.id}}/sub-org/{{i.id}}"
+                  class='flex flex-col gap-2'>
+                  <div class='pt-6 px-6 flex w-full items-center justify-between space-x-6'>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-open w-10 h-10 outline p-2 rounded-full outline-gray-200"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>
+                    <div class='flex-1 truncate'>
+                      <div class='flex items-center space-x-3'>
+                        <h3 class='truncate text-lg font-medium text-zinc-900'>
+                          {{i.name}}
+                        </h3>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+
+                <div class='px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500'>
+                    <div class='flex items-center gap-2'>
+                        {{ i.created_at.strftime('%b %Y') }}
+                      
+                    </div> 
+                    <div class='flex items-center gap-2'>
+                        {{ i.members.all() | length }} member(s)
+                    </div>
+                    
+                    {% if current_user.id != i.leader %}
+                    <button href="/dashboard/delete-sub-org/{{i.id}}" class="ml-18 w-10 h-10 bg-red-500 disabled:bg-red-400 px-2 py-1 text-white rounded-2xl flex items-center justify-center hover:bg-red-600 transition duration-300" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
+                            <path d="M3 6h18" />
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            <line x1="10" x2="10" y1="11" y2="17" />
+                            <line x1="14" x2="14" y1="11" y2="17" />
+                        </svg>
+                    </button>
+                    {% else %}
+                    <a href="/dashboard/delete-sub-org/{{i.id}}" class="ml-18 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl flex items-center justify-center hover:bg-red-600 transition duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
+                            <path d="M3 6h18" />
+                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            <line x1="10" x2="10" y1="11" y2="17" />
+                            <line x1="14" x2="14" y1="11" y2="17" />
+                        </svg>
+                    </a>
+                    {% endif %}
+                    
+                  </div>
+        </li>
+    {% endfor %}
+    </ul>
+</main>
+{% endblock content %}
