@@ -94,7 +94,7 @@ def create_sub_org(id):
     form = CreateOrgForm()
     if current_user.subPlan == 'Free':
         max_sub_orgs = 10
-        if SubOrganisation.query.filter_by(leader_id=current_user.id).count() >= max_sub_orgs:
+        if SubOrganisation.query.filter_by(leader=current_user.id).count() >= max_sub_orgs:
             flash('Free users are limited to creating up to 10 sub-organizations in a master organization.', 'error')
     if form.validate_on_submit():
         new_sub_organisation = SubOrganisation(name=form.name.data, parent_organization_id=id, leader=current_user.id)
