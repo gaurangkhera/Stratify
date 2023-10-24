@@ -1,14 +1,14 @@
 {
     "builds": [
         {
-            "src": "/hack/__init__.py",
+            "src": "./app.py",
             "use": "@vercel/python"
         }
     ],
     "routes": [
         {
-            "src": "/hack/(.*)",
-            "dest": "./app.py"
+            "src": "/(.*)",
+            "dest": "/hack/__init__.py"
         }
     ]
 
