@@ -7,8 +7,9 @@
     ],
     "routes": [
         {
-            "src": "/",
-            "dest": "./app.py"
+            "src": "/hack/(.*)",
+            "dest": "/hack/__init__.py"
         }
     ]
+
 }
