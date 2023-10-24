@@ -1,28 +1,5 @@
 {
-    "version": 2,
-    "builds": [{ "src": "app.py", "use": "@now/python" }],
-    "routes": [
-      { "handle": "filesystem" },
-      {
-        "src": "/models.py",
-        "dest": "/hack/models.py"
-      },
-      {
-        "src": "/forms.py",
-        "dest": "/hack/forms.py"
-      },
-      {
-        "src": "/templates/(.*)",
-        "dest": "/hack/templates/$1"
-      },
-      {
-        "src": "/static/(.*)",
-        "dest": "/hack/static/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/app.py"
-      }
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/app.py" }
     ]
   }
-  
