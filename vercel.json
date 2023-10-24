@@ -1,5 +1,14 @@
 {
-    "rewrites":  [
-      {"source": "/(.*)", "destination": "/"}
+    "builds": [
+        {
+            "src": "hack/__init__.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "hack/__init__.py"
+        }
     ]
-  }
+}
