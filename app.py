@@ -18,7 +18,7 @@ def home():
 @app.route('/reg', methods=['GET', 'POST'])
 def reg():
     form = RegForm()
-    mess=''
+    mess = ''
     if form.validate_on_submit():
         email = form.email.data
         username = form.username.data
@@ -61,15 +61,15 @@ def create_org():
     form = CreateOrgForm()
     
     # Impose limits for free users
-    if current_user.subplan == 'Free':
+    if current_user.subPlan == 'Free':
         max_master_orgs = 2
         if MasterOrganisation.query.filter_by(leader_id=current_user.id).count() >= max_master_orgs:
-            flash('free users are limited to creating up to 2 master organizations.', 'error')
+            flash('Free users are limited to creating up to 2 master organizations.', 'error')
     if form.validate_on_submit():
         new_master_organisation = MasterOrganisation(name=form.name.data, leader_id=current_user.id)
         db.session.add(new_master_organisation)
         db.session.commit()
-        flash('organisation created successfully.', 'success')
+        flash('Organization created successfully.', 'success')
         return redirect(url_for('dashboard'))
     
     return render_template('create_org.html', form=form)
@@ -95,7 +95,7 @@ def create_sub_org(id):
     if current_user.subPlan == 'Free':
         max_sub_orgs = 10
         if SubOrganisation.query.filter_by(leader_id=current_user.id).count() >= max_sub_orgs:
-            flash('free users are limited to creating upto 10 sub-organizations in a master organization.', 'error')
+            flash('Free users are limited to creating up to 10 sub-organizations in a master organization.', 'error')
     if form.validate_on_submit():
         new_sub_organisation = SubOrganisation(name=form.name.data, parent_organization_id=id, leader=current_user.id)
         db.session.add(new_sub_organisation)
@@ -103,11 +103,11 @@ def create_sub_org(id):
         new_member = Member(name=current_user.username, email=current_user.email, sub_organization_id=new_sub_organisation.id, user_id=current_user.id)
         db.session.add(new_member)
         db.session.commit()
-        flash('sub-organisation created successfully.', 'success')
+        flash('Sub-organisation created successfully.', 'success')
         return redirect(url_for('org_page', id=id))
     
     return render_template('create_sub_org.html', form=form, org=org)
-    
+
 @app.route('/pricing')
 def pricing():
     return render_template('pricing.html')
@@ -120,7 +120,7 @@ def delete_org(id):
         db.session.delete(sub_org)
     db.session.delete(org)
     db.session.commit()
-    flash('organisation deleted successfully.', 'success')
+    flash('Organization deleted successfully.', 'success')
     return redirect(url_for('dashboard'))
 
 @app.route('/dashboard/delete-sub-org/<int:id>')
@@ -129,8 +129,8 @@ def delete_sub_org(id):
     org = SubOrganisation.query.filter_by(id=id).first()
     db.session.delete(org)
     db.session.commit()
-    flash('sub-organisation deleted successfully.', 'success')
-    return redirect('/dashboard/org/'+str(org.parent_organization_id))
+    flash('Sub-organization deleted successfully.', 'success')
+    return redirect('/dashboard/org/' + str(org.parent_organization_id))
 
 @app.route('/dashboard/org/<int:id>/sub-org/<int:so_id>/add-member', methods=['GET', 'POST'])
 @login_required
@@ -141,36 +141,24 @@ def add_member(id, so_id):
     if current_user.subPlan == 'Free':
         max_members_per_sub_org = 25
         if Member.query.filter_by(sub_organization_id=so_id).count() >= max_members_per_sub_org:
-            flash('free users are limited to a maximum of 25 members per sub-organization.', 'error')
+            flash('Free users are limited to a maximum of 25 members per sub-organization.', 'error')
     if form.validate_on_submit():
         email = form.email.data
         user = User.query.filter_by(email=email).first()
         if not user:
-            flash('email not found.', 'error')
+            flash('Email not found.', 'error')
         elif user.email == current_user.email:
-            flash("you can't add yourself.", 'error')
+            flash("You can't add yourself.", 'error')
         elif Member.query.filter_by(user_id=user.id, sub_organization_id=so_id).first():
-            flash('this user is already a member.', 'error')
+            flash('This user is already a member.', 'error')
         else:
             new_member = Member(name=user.username, email=user.email, sub_organization_id=sub_org.id, user_id=user.id)
             db.session.add(new_member)
             db.session.commit()
-            flash('member added successfully.', 'success')
+            flash('Member added successfully.', 'success')
             return redirect(url_for('sub_org_page', id=id, so_id=so_id))
     
     return render_template('add_member.html', form=form, org=org, sub_org=sub_org)
-
-@app.route('/dashboard/org/<id>/sub-org/<so_id>/delete-member/<m_id>')
-@login_required
-def delete_member(id, so_id, m_id):
-    org = MasterOrganisation.query.filter_by(id=id).first()
-    sub_org = SubOrganisation.query.filter_by(id=so_id).first()
-    member = Member.query.filter_by(id=m_id).first()
-    sub_org.members.remove(member)
-    db.session.delete(member)
-    db.session.commit()
-    flash('member removed successfully.', 'success')
-    return redirect(url_for('sub_org_page', id=id, so_id=so_id))
 
 @app.route('/dashboard/org/<int:id>/sub-org/<int:so_id>/add-resources', methods=['GET', 'POST'])
 @login_required
@@ -185,6 +173,7 @@ def add_resources(id, so_id):
                 resource = Resource(name=name, quantity=int(quantity), sub_org=so_id)
                 db.session.add(resource)
                 db.session.commit()
+        flash('Resources added successfully.', 'success')
 
         return redirect(f'/dashboard/org/{id}/sub-org/{so_id}')
 
@@ -220,7 +209,7 @@ def cancel_subscription():
         current_user.subPlan = 'Free'
         db.session.add(current_user)
         db.session.commit()
-        flash('subscription cancelled successfully.', 'success')
+        flash('Subscription cancelled successfully.', 'success')
     return redirect(url_for('billing'))
 
 
@@ -233,13 +222,13 @@ def login():
         password = form.password.data
         user = User.query.filter_by(email=email).first()
         if not user:
-            flash('email not found.', 'error')
+            flash('Email not found.', 'error')
         else:
             if check_password_hash(user.password, password):
                 login_user(user, remember=True)
                 return redirect(url_for('home'))
             else:
-                flash('incorrect password.', 'error')
+                flash('Incorrect password.', 'error')
     return render_template('login.html', mess=mess, form=form)
 
 @app.route('/logout')

@@ -11,17 +11,17 @@
 
       {% if current_user.id != org.leader_id %}
       <button class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
-        add member
+        Add member
       </button>
       <button class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
-        add resources
+        Add resources
       </button>
       {% else %}
       <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/add-member" class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">
-        add member
+        Add member
       </a>
       <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/add-resources" class="border-2 border-[#10172A] rounded-2xl bg-[#10172A] hover:bg-white text-white hover:text-[#10172A] transition-all 2s font-medium px-8 py-2 mr-4">
-        add resources
+        Add resources
       </a>
       {% endif %}
     </div>

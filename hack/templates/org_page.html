@@ -8,7 +8,7 @@
 
       {% if current_user.id != org.leader_id %}
       <button href="/dashboard/org/{{org.id}}/create-sub-org" class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
-        create sub-organisations
+        Create sub-organisations
       </button>
       {% else %}
       <a href="/dashboard/org/{{org.id}}/create-sub-org" class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">

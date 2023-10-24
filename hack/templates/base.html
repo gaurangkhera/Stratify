@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <script src="https://cdn.tailwindcss.com"></script>
-  <title>stratify.</title>
+  
+  <title>Stratify</title>
 </head>
 
 <style>
@@ -26,12 +27,12 @@
         <ul class="mx-auto flex items-center">
           <li class="p-5 xl:p-8 ">
             <a href="/" class="inline-flex items-center justify-center rounded-2xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-200 p-4">
-              <span>home</span>
+              <span>Home</span>
             </a>
           </li>
           <li class="p-5 xl:p-8">
             <a href="/pricing" class="inline-flex items-center justify-center rounded-2xl text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-gray-200 p-4">
-              <span>pricing</span>
+              <span>Pricing</span>
             </a>
           </li>
           <li class="p-5 xl:p-8">
@@ -43,33 +44,40 @@
       </nav>
       {% if not current_user.is_authenticated %}
       <a href="/login"
-        class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">sign
+        class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">Sign
         in</a>
       <a href="/reg"
-        class="border-2 border-white bg-[#10172A] text-white hover:border-[#10172A] rounded-2xl hover:bg-white hover:text-[#10172A] transition-all 2s font-medium px-8 py-2 mr-4">sign
+        class="border-2 border-white bg-[#10172A] text-white hover:border-[#10172A] rounded-2xl hover:bg-white hover:text-[#10172A] transition-all 2s font-medium px-8 py-2 mr-4">Sign
         up</a>
       {% else %}
       <div class="relative group inline-block text-left">
         <button @click="open = !open" id="user-menu-button" class="rounded-full p-2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-10 h-10 outline p-2 rounded-full outline-gray-200"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </button>        
-        <ul x-show="open" @click.away="open = false" class="opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all 2s absolute left-0 z-10 mt-2 w-32 origin-top-right bg-white border border-gray-300 rounded-lg shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none" id="user-menu" role="listbox" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+        <ul x-show="open" @click.away="open = false" class="opacity-0 invisible group-hover:visible group-hover:opacity-100 transition-all 2s absolute left-0 z-10 mt-2 w-32 bg-white border border-gray-300 rounded-xl shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none" id="user-menu" role="listbox" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
           {% if current_user.subPlan == 'Free' %}
-          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
-            <a href="/billing">Upgrade</a>
+          <li role="option" class="p-2 rounded-xl text-[#10172A] text-sm font-medium hover:bg-gray-100">
+            <a href="/billing" class="bg-clip-text text-transparent bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E]">
+              Upgrade
+            </a>
           </li>
           {% elif current_user.subPlan == 'Pro' %}
-          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
+          <li role="option" class="p-2 rounded-xl text-[#10172A] text-sm font-medium hover:bg-gray-100">
             <a href="/billing">Manage Subscription</a>
           </li>
           {% endif %}
-          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
-            <a href="/dashboard">Dashboard</a>
+          <li role="option" class="p-2 rounded-xl text-[#10172A] text-sm font-medium hover:bg-gray-100">
+            <a href="/dashboard">
+              Dashboard
+            </a>
           </li>
-          <li role="option" class="p-2 text-gray-700 hover:bg-gray-100">
-            <a href="/logout">Sign Out</a>
+          <li role="option" class="p-2 rounded-xl text-[#10172A] text-sm font-medium hover:bg-gray-100">
+            <a href="/logout">
+              Sign Out
+            </a>
           </li>
         </ul>
+              
       </div>
       {% endif %}
     </div>

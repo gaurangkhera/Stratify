@@ -8,9 +8,9 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(), nullable=False)
     email = db.Column(db.String(64), index=True, unique=True)
-    password = db.Column(db.String(100))
+    password = db.Column(db.Text())
     created_at = db.Column(db.DateTime, default=datetime.now())
     organisations = db.relationship('MasterOrganisation', backref='leader', lazy='dynamic')
     subOrgs = db.relationship('SubOrganisation', backref='subLeader', lazy='dynamic')

@@ -9,12 +9,12 @@
                 <div id="resource-inputs">
                     <div class="resource mb-4">
                         <label for="resource-name" class="mb-2 inline-block text-sm text-gray-800 sm:text-base">Resource Name</label>
-                        <input type="text" name="resource-name[]" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-[#10172A] transition duration-100 focus:ring">
+                        <input type="text" required name="resource-name[]" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-[#10172A] transition duration-100 focus:ring">
                         <label for="resource-quantity" class="mt-2 inline-block text-sm text-gray-800 sm:text-base">Resource Quantity</label>
-                        <input type="number" name="resource-quantity[]" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-[#10172A] transition duration-100 focus:ring">
+                        <input type="number" required name="resource-quantity[]" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-[#10172A] transition duration-100 focus:ring">
                     </div>
                 </div>
-                <button type="button" class="block rounded-lg bg-[#10172A] px-8 py-3 text-center text-sm font-medium text-white outline-none ring-gray-300 transition duration-100 focus-visible:ring active:bg-gray-600 md:text-base" id="add-resource">+ Add Resource</button>
+                <button type="button" class="block rounded-lg bg-[#10172A] px-8 py-3 text-center text-sm font-medium text-white outline-none ring-gray-300 transition duration-100 focus-visible:ring active:bg-gray-600 md:text-base" id="add-resource">Add more</button>
                 <button class="block rounded-lg bg-[#10172A] px-8 py-3 text-center text-sm font-medium text-white outline-none ring-gray-300 transition duration-100 focus-visible:ring active:bg-gray-600 md:text-base" id="submit-resource-form">Submit</button>
                 <div class="flex items-center justify-center bg-gray-100 p-4">
                     <p class="text-center text-sm text-gray-500">Don't want to add more resources? <a href="/dashboard/org/{{ id }}/sub-org/{{ so_id }}" class="text-[#10172A] transition duration-100 hover:text-[#10172A] active:text-[#10172A]">Cancel.</a></p>
