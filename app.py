@@ -187,6 +187,7 @@ def add_resources(id, so_id):
     return render_template('add_resource.html', id=id, so_id=so_id)
 
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/delete-member/<m_id>', methods=['GET', 'POST'])
+@login_required
 def delete_member(id, so_id, m_id):
     member = Member.query.filter_by(id=m_id).first()
     if member.user_id != current_user.id:
@@ -202,6 +203,7 @@ def faq():
     return render_template('faq.html')
 
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>')
+@login_required
 def member_page(id, so_id, m_id):
     org = MasterOrganisation.query.filter_by(id=id).first()
     sub_org = SubOrganisation.query.filter_by(id=so_id).first()
@@ -242,6 +244,7 @@ def edit_res(id, so_id, r_id, m_id):
     return render_template('edit_res.html',org=org, sub_org=sub_org,member=Member.query.filter_by(id=m_id).first(), form=form, alloc=alloc, id=id, so_id=so_id, m_id=m_id)
 
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/allocate-resources', methods=['POST'])
+@login_required
 def allocate_resources(id, so_id, m_id):
     sub_org = SubOrganisation.query.filter_by(id=so_id).first()
     try:
@@ -266,6 +269,7 @@ def allocate_resources(id, so_id, m_id):
         return jsonify(response), 400
     
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/deallocate-resource/<r_id>', methods=['GET','POST'])
+@login_required
 def dealloc(id, so_id, m_id, r_id):
     org = MasterOrganisation.query.filter_by(id=id).first()
     sub_org = SubOrganisation.query.filter_by(id=id).first()
@@ -279,6 +283,7 @@ def dealloc(id, so_id, m_id, r_id):
     return redirect(f'/dashboard/org/{org.id}/sub-org/{so_id}/member/{member.id}')
 
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/delete-resource/<r_id>', methods=['GET', 'POST'])
+@login_required
 def delete_resource(id, so_id, r_id):
     member = Resource.query.filter_by(id=r_id).first()
     db.session.delete(member)
@@ -300,14 +305,15 @@ def billing():
                 },
             ],
             mode='subscription',
-            success_url=url_for('dashboard', success=True),
-            cancel_url=url_for('dashboard', success=False),
+            success_url='https://stratify-smoky.vercel.app/dashboard?success=True',
+            cancel_url='https://stratify-smoky.vercel.app/dashboard?success=False',
         )
         return redirect(session.url, code=303)
 
     return render_template('pro_plan_checkout.html', user=current_user)
 
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/promote-to-sub-org-leader', methods=['GET', 'POST'])
+@login_required
 def promote_suborg(id, so_id, m_id):
     org = MasterOrganisation.query.filter_by(id=id).first()
     sub_org = SubOrganisation.query.filter_by(id=so_id).first()
@@ -326,6 +332,7 @@ def promote_suborg(id, so_id, m_id):
     return redirect(url_for('member_page', id=id, so_id=so_id, m_id=m_id))
 
 @app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/promote-to-org-leader', methods=['GET', 'POST'])
+@login_required
 def promote_org(id, so_id, m_id):
     org = MasterOrganisation.query.filter_by(id=id).first()
     sub_org = SubOrganisation.query.filter_by(id=so_id).first()
