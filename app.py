@@ -1,11 +1,12 @@
 from hack import app, create_db, db
 from flask import render_template, redirect, url_for, flash, request, session, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
-from hack.forms import LoginForm, RegForm, CreateOrgForm, AddMemberForm
+from hack.forms import LoginForm, RegForm, CreateOrgForm, AddMemberForm, EditQuantityForm
 import stripe
 from hack.models import User, MasterOrganisation, SubOrganisation, Resource, ResourceAllocation, Member
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import or_
+import json
 
 stripe.api_key = 'sk_test_51O4bOCSDZFni4Xk6I8la6qDeGwmeqWSY6CAiN7XEm8qdW8mvSsvT8CKL0HvX1JEL1UTMfeCE13iUCbGEWGnAaJCa00dj1B1Y1S'
 
@@ -38,13 +39,11 @@ def reg():
 @login_required
 def dashboard():
     sess_id = request.args.get('success')
-    print(sess_id)
     if sess_id:
         try:
                 current_user.subPlan = 'Pro'
                 db.session.add(current_user)
                 db.session.commit()
-                print(current_user.subPlan)
                 flash('Payment successful. You are now on the Pro plan.', 'success')
         except stripe.error.StripeError as e:
             flash(f'Payment unsuccessful - {e}', 'error')
@@ -59,19 +58,18 @@ def dashboard():
 @login_required
 def create_org():
     form = CreateOrgForm()
-    
-    # Impose limits for free users
-    if current_user.subPlan == 'Free':
-        max_master_orgs = 2
-        if MasterOrganisation.query.filter_by(leader_id=current_user.id).count() >= max_master_orgs:
-            flash('Free users are limited to creating up to 2 master organizations.', 'error')
     if form.validate_on_submit():
+        # Check if the user has a 'Free' subscription plan and has exceeded the limit
+        if current_user.subPlan == 'Free' and MasterOrganisation.query.filter_by(leader_id=current_user.id).count() >= 2:
+            flash('Free users are limited to creating up to 2 master organizations.', 'error')
+            return redirect(url_for('pricing'))
+
         new_master_organisation = MasterOrganisation(name=form.name.data, leader_id=current_user.id)
         db.session.add(new_master_organisation)
         db.session.commit()
         flash('Organization created successfully.', 'success')
         return redirect(url_for('dashboard'))
-    
+
     return render_template('create_org.html', form=form)
 
 @app.route('/dashboard/org/<int:id>')
@@ -92,11 +90,12 @@ def sub_org_page(id, so_id):
 def create_sub_org(id):
     org = MasterOrganisation.query.filter_by(id=id).first()
     form = CreateOrgForm()
-    if current_user.subPlan == 'Free':
-        max_sub_orgs = 10
-        if SubOrganisation.query.filter_by(leader=current_user.id).count() >= max_sub_orgs:
-            flash('Free users are limited to creating up to 10 sub-organizations in a master organization.', 'error')
     if form.validate_on_submit():
+        # Check if the user has a 'Free' subscription plan and has exceeded the limit
+        if current_user.subPlan == 'Free' and SubOrganisation.query.filter_by(leader=current_user.id).count() >= 10:
+            flash('Free users are limited to creating up to 10 sub-organizations in a master organization.', 'error')
+            return redirect(url_for('pricing'))
+
         new_sub_organisation = SubOrganisation(name=form.name.data, parent_organization_id=id, leader=current_user.id)
         db.session.add(new_sub_organisation)
         db.session.commit()
@@ -105,7 +104,7 @@ def create_sub_org(id):
         db.session.commit()
         flash('Sub-organisation created successfully.', 'success')
         return redirect(url_for('org_page', id=id))
-    
+
     return render_template('create_sub_org.html', form=form, org=org)
 
 @app.route('/pricing')
@@ -116,10 +115,31 @@ def pricing():
 @login_required
 def delete_org(id):
     org = MasterOrganisation.query.filter_by(id=id).first()
+
+    # Delete all sub-organizations, their members, resources, and allocations
     for sub_org in org.sub_orgs:
+        # Delete all members of the sub-organization
+        members = Member.query.filter_by(sub_organization_id=sub_org.id).all()
+        for member in members:
+            db.session.delete(member)
+
+        # Delete all resources of the sub-organization
+        resources = Resource.query.filter_by(sub_org=sub_org.id).all()
+        for resource in resources:
+            db.session.delete(resource)
+
+        # Delete all resource allocations of the sub-organization
+        resource_allocations = ResourceAllocation.query.filter_by(sub_org_id=sub_org.id).all()
+        for allocation in resource_allocations:
+            db.session.delete(allocation)
+
+        # Delete the sub-organization itself
         db.session.delete(sub_org)
+
+    # Delete the main organization
     db.session.delete(org)
     db.session.commit()
+
     flash('Organization deleted successfully.', 'success')
     return redirect(url_for('dashboard'))
 
@@ -127,6 +147,10 @@ def delete_org(id):
 @login_required
 def delete_sub_org(id):
     org = SubOrganisation.query.filter_by(id=id).first()
+    members = Member.query.filter_by(sub_organization_id=org.id).all()
+    for i in members:
+        db.session.delete(i)
+        db.session.commit()
     db.session.delete(org)
     db.session.commit()
     flash('Sub-organization deleted successfully.', 'success')
@@ -138,10 +162,12 @@ def add_member(id, so_id):
     form = AddMemberForm()
     org = MasterOrganisation.query.filter_by(id=id).first()
     sub_org = SubOrganisation.query.filter_by(id=so_id).first()
-    if current_user.subPlan == 'Free':
-        max_members_per_sub_org = 25
-        if Member.query.filter_by(sub_organization_id=so_id).count() >= max_members_per_sub_org:
-            flash('Free users are limited to a maximum of 25 members per sub-organization.', 'error')
+    
+    # Check if the user has a 'Free' subscription plan and has exceeded the member limit
+    if current_user.subPlan == 'Free' and Member.query.filter_by(sub_organization_id=so_id).count() >= 25:
+        flash('Free users are limited to a maximum of 25 members per sub-organization.', 'error')
+        return redirect(url_for('pricing'))
+    
     if form.validate_on_submit():
         email = form.email.data
         user = User.query.filter_by(email=email).first()
@@ -179,6 +205,117 @@ def add_resources(id, so_id):
 
     return render_template('add_resource.html', id=id, so_id=so_id)
 
+@app.route('/dashboard/org/<id>/sub-org/<so_id>/delete-member/<m_id>', methods=['GET', 'POST'])
+def delete_member(id, so_id, m_id):
+    member = Member.query.filter_by(id=m_id).first()
+    if member.user_id != current_user.id:
+        db.session.delete(member)
+        db.session.commit()
+        flash('Member deleted successfully.', 'success')
+    else:
+        flash('You cannot delete yourself.', 'error')
+    return redirect(url_for('sub_org_page', id=id, so_id=so_id))
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
+@app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>')
+def member_page(id, so_id, m_id):
+    org = MasterOrganisation.query.filter_by(id=id).first()
+    sub_org = SubOrganisation.query.filter_by(id=so_id).first()
+    member = Member.query.filter_by(id=m_id).first()
+    alloc_resources = [x for x in member.resources]
+    ser_res = [Resource.query.filter_by(id=x.id).first() for x in alloc_resources]
+    resources_json = json.dumps([{
+    "resource_id": resource.id,
+    "resource_name": resource.name,
+    "resource_quantity": resource.quantity
+} for resource in sub_org.resources.all()])
+    return render_template('member.html', org=org, sub_org=sub_org, member=member, resources=resources_json,member_resources=ser_res)
+
+@app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/edit-resource/<r_id>', methods=['GET', 'POST'])
+@login_required
+def edit_res(id, so_id, r_id, m_id):
+    org = MasterOrganisation.query.filter_by(id=id).first()
+    sub_org = SubOrganisation.query.filter_by(id=so_id).first()
+    alloc = ResourceAllocation.query.filter_by(id=r_id).first()
+    resource = Resource.query.filter_by(id=alloc.resource_id).first()
+    form = EditQuantityForm()
+    if form.validate_on_submit():
+        new_qty = form.qty.data
+        diff = new_qty - alloc.allocation_quantity
+        
+        if diff > 0:
+            resource.quantity -= diff
+        elif diff < 0:
+            resource.quantity -= diff
+
+        alloc.allocation_quantity = new_qty
+        db.session.add(resource)
+        db.session.add(alloc)
+        db.session.commit()
+        flash('Resource quantity updated successfully.', 'success')
+        return redirect(url_for('member_page', id=id, so_id=so_id, m_id=m_id))
+
+    return render_template('edit_res.html',org=org, sub_org=sub_org,member=Member.query.filter_by(id=m_id).first(), form=form, alloc=alloc, id=id, so_id=so_id, m_id=m_id)
+
+@app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/allocate-resources', methods=['POST'])
+def allocate_resources(id, so_id, m_id):
+    sub_org = SubOrganisation.query.filter_by(id=so_id).first()
+    try:
+        # Get the JSON data from the request
+        data = request.get_json()
+        print(data)
+
+        # Process the data as needed
+        # For example, you can loop through the selected resources
+        for resource in data:
+            resource_name = resource['resource_name']
+            resource_id = resource['resource_id']
+            resource_quantity = resource['quantity']
+            # Process and allocate the resources as required
+
+            # Insert resource allocation into the database
+            resource = Resource.query.filter_by(id=resource_id).first()
+
+            new_resource_allocation = ResourceAllocation(resource_id=resource.id, member_id=m_id, allocation_quantity=resource_quantity, resource_name=resource_name, sub_org_id=sub_org.id)
+            resource.quantity -= int(resource_quantity)
+            db.session.add(new_resource_allocation)
+            db.session.commit()
+            db.session.add(resource)
+            db.session.commit()
+            
+        # Return a JSON response in the success case
+        response = {'message': 'Resources allocated successfully'}
+        return jsonify(response)
+    except Exception as e:
+        # Handle any errors here
+        error_message = str(e)
+        print(error_message)
+        response = {'error': error_message}
+        return jsonify(response), 400
+    
+@app.route('/dashboard/org/<id>/sub-org/<so_id>/member/<m_id>/deallocate-resource/<r_id>', methods=['GET','POST'])
+def dealloc(id, so_id, m_id, r_id):
+    org = MasterOrganisation.query.filter_by(id=id).first()
+    sub_org = SubOrganisation.query.filter_by(id=id).first()
+    member = Member.query.filter_by(id=m_id).first()
+    resource_alloc = ResourceAllocation.query.filter_by(id=r_id).first()
+    resource = Resource.query.filter_by(id=resource_alloc.resource_id).first()
+    resource.quantity += resource_alloc.allocation_quantity
+    db.session.add(resource)
+    db.session.delete(resource_alloc)
+    db.session.commit()
+    return redirect(f'/dashboard/org/{org.id}/sub-org/{sub_org.id}/member/{member.id}')
+
+@app.route('/dashboard/org/<id>/sub-org/<so_id>/delete-resource/<r_id>', methods=['GET', 'POST'])
+def delete_resource(id, so_id, r_id):
+    member = Resource.query.filter_by(id=r_id).first()
+    db.session.delete(member)
+    db.session.commit()
+    return redirect(url_for('sub_org_page', id=id, so_id=so_id))
+
 @app.route('/billing', methods=['GET', 'POST'])
 @login_required
 def billing():
@@ -195,8 +332,8 @@ def billing():
                 },
             ],
             mode='subscription',
-            success_url='http://localhost:6969/dashboard?success=True',
-            cancel_url='http://localhost:6969/billing?cancelled=True',
+            success_url=url_for('dashboard', success=True),
+            cancel_url=url_for('dashboard', success=False),
         )
         return redirect(session.url, code=303)
 

@@ -1,81 +1,170 @@
 {% extends 'base.html' %}
 {% block content %}
 <main class='mx-auto max-w-7xl md:p-10'>
-  {% for i in sub_org.resources %}
-    {{i.name}} - {{i.quantity}}
-  {% endfor %}
     <div class='mt-4 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0'>
-      <h1 class='mb-3 font-bold text-5xl text-gray-900 heading'>
-        {{sub_org.name}}'s members
-      </h1>
+        <h1 class='mb-3 font-bold text-5xl text-gray-900 heading'>
+            {{sub_org.name}}
+        </h1>
 
-      {% if current_user.id != org.leader_id %}
-      <button class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
-        Add member
-      </button>
-      <button class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
-        Add resources
-      </button>
-      {% else %}
-      <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/add-member" class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4">
-        Add member
-      </a>
-      <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/add-resources" class="border-2 border-[#10172A] rounded-2xl bg-[#10172A] hover:bg-white text-white hover:text-[#10172A] transition-all 2s font-medium px-8 py-2 mr-4">
-        Add resources
-      </a>
-      {% endif %}
+        <div class="flex mt-4 sm:mt-0">
+            <button id="members-tab" class="border-2 border-[#10172A] rounded-tl-xl rounded-bl-xl px-8 py-2 mr-2 focus:outline-none font-medium text-white bg-[#10172A] hover:bg-[#10172A] hover:text-white transition-all 2s">Members</button>
+            <button id="resources-tab" class="border-2 border-[#10172A] rounded-tr-xl rounded-br-xl px-8 py-2 focus:outline-none font-medium text-[#10172A] hover:bg-[#10172A] hover:text-white transition-all 2s">Resources</button>
+        </div>
     </div>
-    <ul class='mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3'>
-    {% for i in members %}
-        <li class="ol-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg">
-            <a
-                  href="/dashboard/org/{{org.id}}/sub-org/{{i.id}}/members/{{i.id}}"
-                  class='flex flex-col gap-2'>
-                  <div class='pt-6 px-6 flex w-full items-center justify-between space-x-6'>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-10 h-10 outline p-2 rounded-full outline-gray-200"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <div class='flex-1 truncate'>
-                      <div class='flex items-center space-x-3'>
-                        <h3 class='truncate text-lg font-medium text-zinc-900'>
-                          {{i.name}}
-                          {% if i.name == current_user.username %}
-                            (you)
-                          {% endif %}
-                        </h3>
+    <div id="members-content">
+        {% if current_user.id == sub_org.leader and current_user.id == org.leader_id %}
+        <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/add-member"><button class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mt-8 mb-4">
+          Add member
+      </button></a>
+        {% else %}
+        <button class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
+          Add member
+        </button>
+        {% endif %}
+        <ul class='grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3'>
+            {% for i in members %}
+                <li class="ol-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg">
+                    <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/member/{{i.id}}" class='flex flex-col gap-2'>
+                        <div class='pt-6 px-6 flex w-full items-center justify-between space-x-6'>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-10 h-10 outline p-2 rounded-full outline-gray-200">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                            <div class='flex-1 truncate'>
+                                <div class='flex items-center space-x-3'>
+                                    <h3 class='truncate text-lg font-medium text-zinc-900'>
+                                        {{i.name}}
+                                        {% if i.name == current_user.username %}
+                                            (you)
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <div class='px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500'>
+                        <div class='flex items-center gap-2 truncate ml-8'>
+                            {{i.email}}
+                        </div>
+                        {% if current_user.id != sub_org.leader and current_user.id != org.leader_id %}
+                        <button class="ml-56 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl disabled:bg-red-400 flex items-center justify-center hover:bg-red-600 transition duration-300" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                <line x1="10" x2="10" y1="11" y2="17" />
+                                <line x1="14" x2="14" y1="11" y2="17" />
+                            </svg>
+                        </button>
+                        {% else %}
+                        <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/delete-member/{{i.id}}" class="ml-56 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl flex items-center justify-center hover:bg-red-600 transition duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                <line x1="10" x2="10" y1="11" y2="17" />
+                                <line x1="14" x2="14" y1="11" y2="17" />
+                            </svg>
+                        </a>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="resources-content" style="display: none;">
+        {% if current_user.id == sub_org.leader and current_user.id == org.leader_id %}
+        <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/add-resources"><button class="border-2 border-[#10172A] rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mt-8 mb-4">
+          Add resources
+      </button></a>
+        {% else %}
+        <button class="border-2 border-[#10172A] disabled:text-gray-400 disabled:border-gray-400 disabled:hover:bg-white rounded-2xl hover:bg-[#10172A] hover:text-white transition-all 2s font-medium px-8 py-2 mr-4" disabled>
+          Add resources
+        </button>
+        {% endif %}
+        <ul class='grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3'>
+          {% for i in sub_org.resources %}
+              <li class="ol-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg">
+                  <div class='flex flex-col gap-2'>
+                      <div class='pt-6 px-6 flex w-full items-center justify-between space-x-6'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database w-10 h-10 outline p-2 rounded-full"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>
+                          <div class='flex-1 truncate'>
+                              <div class='flex items-center space-x-3'>
+                                  <h3 class='truncate text-lg font-medium text-zinc-900'>
+                                      {{i.name}}
+                                  </h3>
+                              </div>
+                          </div>
                       </div>
                     </div>
+                  <div class='px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500'>
+                      <div class='flex items-center gap-2'>
+                          Quantity: {{i.quantity}}
+                      </div>
+                      {% if current_user.id != sub_org.leader and current_user.id != org.leader_id %}
+                      <button class="ml-56 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl disabled:bg-red-400 flex items-center justify-center hover:bg-red-600 transition duration-300" disabled>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
+                              <path d="M3 6h18" />
+                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              <line x1="10" x2="10" y1="11" y2="17" />
+                              <line x1="14" x2="14" y1="11" y2="17" />
+                          </svg>
+                      </button>
+                      {% else %}
+                      <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/delete-resource/{{i.id}}" class="ml-56 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl flex items-center justify-center hover:bg-red-600 transition duration-300">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
+                              <path d="M3 6h18" />
+                              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              <line x1="10" x2="10" y1="11" y2="17" />
+                              <line x1="14" x2="14" y1="11" y2="17" />
+                          </svg>
+                      </a>
+                      {% endif %}
                   </div>
-                </a>
-
-                <div class='px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500'>
-                    <div class='flex items-center gap-2'>
-                      {{i.email}}
-                    </div>
-  
-                    {% if current_user.id != sub_org.leader %}
-                    <button class="ml-56 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl disabled:bg-red-400 flex items-center justify-center hover:bg-red-600 transition duration-300" disabled>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
-                          <path d="M3 6h18" />
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                          <line x1="10" x2="10" y1="11" y2="17" />
-                          <line x1="14" x2="14" y1="11" y2="17" />
-                      </svg>
-                    </button>
-                    {% else %}
-                    <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/delete-member/{{i.id}}" class="ml-56 w-10 h-10 bg-red-500 px-2 py-1 text-white rounded-2xl flex items-center justify-center hover:bg-red-600 transition duration-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2 mx-auto my-auto">
-                          <path d="M3 6h18" />
-                          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                          <line x1="10" x2="10" y1="11" y2="17" />
-                          <line x1="14" x2="14" y1="11" y2="17" />
-                      </svg>
-                  </a>
-                    {% endif %}
-                    
-                  </div>
-        </li>
-    {% endfor %}
-    </ul>
+              </li>
+          {% endfor %}
+      </ul>
+    </div>
 </main>
+<script>
+  const membersTab = document.getElementById("members-tab");
+  const resourcesTab = document.getElementById("resources-tab");
+  const membersContent = document.getElementById("members-content");
+  const resourcesContent = document.getElementById("resources-content");
+  
+  // Check local storage for the stored tab state
+  const storedTab = localStorage.getItem("currentTab");
+  
+  // Function to update tab styles
+  function updateTabStyles(selectedTab) {
+      if (selectedTab === "members") {
+          membersTab.classList.add("text-white", "bg-[#10172A]");
+          resourcesTab.classList.remove("text-white", "bg-[#10172A]");
+          membersContent.style.display = "block";
+          resourcesContent.style.display = "none";
+      } else {
+          resourcesTab.classList.add("text-white", "bg-[#10172A]");
+          membersTab.classList.remove("text-white", "bg-[#10172A]");
+          membersContent.style.display = "none";
+          resourcesContent.style.display = "block";
+      }
+  }
+
+  // Check if a stored tab state exists and update the tab styles
+  if (storedTab) {
+      updateTabStyles(storedTab);
+  }
+
+  membersTab.addEventListener("click", () => {
+      localStorage.setItem("currentTab", "members"); // Store tab state
+      updateTabStyles("members");
+  });
+
+  resourcesTab.addEventListener("click", () => {
+      localStorage.setItem("currentTab", "resources"); // Store tab state
+      updateTabStyles("resources");
+  });
+</script>
 {% endblock content %}

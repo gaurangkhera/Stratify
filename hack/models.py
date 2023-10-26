@@ -41,11 +41,28 @@ class Resource(db.Model):
     quantity = db.Column(db.Integer, default=0)
     sub_org = db.Column(db.Integer, db.ForeignKey('sub_organisation.id'))
 
+    def serialize(self):
+        return {
+            'resource_id': self.id,
+            'resource_name': self.name,
+            'resource_quantity': self.quantity
+        }
+
 class ResourceAllocation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     resource_id = db.Column(db.Integer, db.ForeignKey('resource.id'))
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
+    resource_name = db.Column(db.String)
+    sub_org_id = db.Column(db.Integer)
     allocation_quantity = db.Column(db.Integer, default=0)
+
+    def serialize(self):
+        return {
+            'alloc_id': self.id,
+            'resource_id': self.resource_id,
+            'alloc_quantity': self.allocation_quantity,
+            'alloc_member_id': self.member_id
+        }
 
 class Member(db.Model):
     id = db.Column(db.Integer, primary_key=True)

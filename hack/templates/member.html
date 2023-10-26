@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class='mx-auto max-w-7xl md:p-10'>
+    <div class='mt-4 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0'>
+        <h1 class='mb-3 font-bold text-5xl text-gray-900 heading'>
+            {{ member.name }}
+        </h1>
+
+        <div class="flex mt-4 sm:mt-0">
+            <button id="members-tab" class="border-2 border-[#10172A] rounded-tl-xl rounded-bl-xl px-8 py-2 mr-2 focus:outline-none font-medium text-white bg-[#10172A] hover:bg-[#10172A] hover:text-white transition-all 2s">Info</button>
+            <button id="resources-tab" class="border-2 border-[#10172A] rounded-tr-xl rounded-br-xl px-8 py-2 focus:outline-none font-medium text-[#10172A] hover:bg-[#10172A] hover:text-white transition-all 2s">Resources</button>
+        </div>
+    </div>
+<div id="members-content">
+    <div class="bg-white p-6 rounded-xl mt-4 transition-all 2s hover:shadow-md border-gray-200 border">
+        <div class="flex items-center mt-">
+            <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user w-10 h-10 text-[#10172A]"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-lg font-semibold text-[#10172A]">{{ member.name }}</h3>
+                <p class="text-gray-500">{{ member.email }}</p>
+            </div>
+        </div>
+        <div class="mt-6">
+            <h2 class="text-2xl font-semibold text-[#10172A]">Allocated Resources</h2>
+            {% for i in member.resources.all() %}
+                <div class="resource-card flex flex-col gap-2 ol-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg mt-4 p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <h3 class="text-lg font-medium text-zinc-900">{{ i.resource_name }} <span class="text-zinc-500">({{ i.allocation_quantity }})</span></h3>
+                            
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="/dashboard/org/{{ org.id }}/sub-org/{{ sub_org.id }}/member/{{ member.id }}/deallocate-resource/{{ i.id }}" class="bg-red-400 hover:bg-red-500 transition-all 2s px-4 py-2 rounded-xl text-white" data-resource-id="{{ i.resource_id }}">Remove</a>
+                            <a href="/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/member/{{member.id}}/edit-resource/{{i.id}}" class="bg-[#10172A] text-white px-4 py-2 rounded-xl hover:bg-[#10172A] hover:text-white rounded-xl">Edit</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>        
+    </div>
+</div>
+</div>
+
+    
+
+    <div id="resources-content" style="display: none;">
+        <input
+            id="resource-search"
+            type="text"
+            placeholder="Search resources"
+            class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-[#10172A] transition duration-100 focus:ring mt-4"
+        >
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" id="resource-list">
+            <!-- Resources will be populated dynamically with JavaScript -->
+        </div>
+        <button id="submit-button" class="bg-[#10172A] text-white px-4 py-2 mt-4 rounded-xl focus:outline-none hover:bg-[#10172A] hover:text-white">Save</button>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.289.0/dist/cjs/lucide.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectedResources = [];
+
+        // Function to switch between tabs and update styles
+        const switchTabs = (tabId) => {
+            const tabs = ['members-content', 'resources-content'];
+            tabs.forEach((tab) => {
+                const tabContent = document.getElementById(tab);
+                if (tab === tabId) {
+                    tabContent.style.display = 'block';
+                    document.cookie = `selectedTab=${tabId}`;
+                } else {
+                    tabContent.style.display = 'none';
+                }
+            });
+        };
+
+        const membersTab = document.getElementById("members-tab");
+        const resourcesTab = document.getElementById("resources-tab");
+
+        const selectedTab = document.cookie.split('; ').find((row) => row.startsWith('selectedTab='));
+    if (selectedTab) {
+        const tabId = selectedTab.split('=')[1];
+        switchTabs(tabId);
+        if (tabId === 'resources-content') {
+            resourcesTab.classList.add('bg-[#10172A]', 'text-white');
+            membersTab.classList.remove('bg-[#10172A]', 'text-white');
+        } else {
+            membersTab.classList.add('bg-[#10172A]', 'text-white');
+            resourcesTab.classList.remove('bg-[#10172A]', 'text-white');
+        }
+    }
+
+        membersTab.addEventListener("click", () => {
+            resourcesTab.classList.remove('bg-[#10172A]', 'text-white');
+            membersTab.classList.add('bg-[#10172A]', 'text-white')
+            switchTabs('members-content');
+        });
+
+        resourcesTab.addEventListener("click", () => {
+            resourcesTab.classList.add('bg-[#10172A]', 'text-white');
+            membersTab.classList.remove('bg-[#10172A]', 'text-white')
+            switchTabs('resources-content');
+        });
+
+        // JavaScript code for populating resources and storing selected resources
+        const resourceList = document.getElementById('resource-list');
+        resourceList.innerHTML = ''; // Clear the initial content
+
+        const resourcesData = {{ resources|safe }};
+        resourcesData.forEach(resource => {
+            const resLi = document.createElement('li');
+            const resourceListItem = document.createElement('div');
+            resourceListItem.className = 'resource-card flex flex-col gap-2 ol-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg mt-4';
+
+            const resourceHeader = document.createElement('div');
+            resourceHeader.className = 'pt-6 px-6 flex w-full items-center justify-between space-x-6';
+
+            const resourceIcon = document.createElement('div');
+            resourceIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-database w-10 h-10 outline p-2 rounded-full"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg>';
+
+            const resourceTitleContainer = document.createElement('div');
+            resourceTitleContainer.className = 'flex-1 truncate';
+
+            const resourceTitle = document.createElement('div');
+            resourceTitle.className = 'flex items-center space-x-3';
+
+            const resourceTitleText = document.createElement('h3');
+            resourceTitleText.className = 'truncate text-lg font-medium text-zinc-900';
+            resourceTitleText.textContent = resource.resource_name;
+
+            const resourceContent = document.createElement('div');
+            resourceContent.className = 'px-6 mt-4 grid grid-cols-3 place-items-center py-2 gap-6 text-xs text-zinc-500';
+
+            const resourceQuantity = document.createElement('div');
+            resourceQuantity.className = 'flex items-center gap-2';
+
+            const quantityInput = document.createElement('input');
+            quantityInput.className = 'w-16 h-10 rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-[#10172A] transition duration-100 focus:ring';
+            quantityInput.type = 'number';
+            quantityInput.value = 1; // Default value, you can set it as needed
+            quantityInput.min = 1;
+            quantityInput.max = resource.resource_quantity;
+
+            const quantitySlash = document.createElement('span');
+            quantitySlash.textContent = '/';
+
+            const quantityDisplay = document.createElement('span');
+            quantityDisplay.textContent = `${resource.resource_quantity}`;
+
+            resourceQuantity.appendChild(quantityInput);
+            resourceQuantity.appendChild(quantitySlash);
+            resourceQuantity.appendChild(quantityDisplay);
+
+            const selectButton = document.createElement('button');
+            selectButton.type = 'button';
+            selectButton.className = 'bg-[#10172A] text-white px-4 py-2 rounded-xl focus:outline-none hover:bg-[#10172A] hover:text-white transition-all 2s';
+            selectButton.textContent = 'Select';
+
+            resourceContent.appendChild(resourceQuantity);
+            resourceContent.appendChild(selectButton);
+
+            selectButton.addEventListener('click', () => {
+                const quantity = quantityInput.value;
+                if (quantity > 0) {
+                    // Check if the resource is already selected
+                    const index = selectedResources.findIndex(item => item.resource_id === resource.resource_id);
+                    if (index === -1) {
+                        // Store the selected resource and quantity
+                        selectedResources.push({ resource_id: resource.resource_id, quantity, resource_name: resource.resource_name });
+
+                        // Change the button text to "Remove" once selected
+                        selectButton.textContent = 'Remove';
+                    } else {
+                        // If the resource is already selected, remove it
+                        selectedResources.splice(index, 1);
+                        // Change the button text back to "Select"
+                        selectButton.textContent = 'Select';
+                    }
+
+                    // Enable or disable the quantity input based on selection
+                    quantityInput.disabled = index !== -1;
+                }
+            });
+
+            // Append elements to their respective parents
+            resourceTitle.appendChild(resourceTitleText);
+            resourceTitleContainer.appendChild(resourceTitle);
+            resourceHeader.appendChild(resourceIcon);
+            resourceHeader.appendChild(resourceTitleContainer);
+            resourceContent.appendChild(resourceQuantity);
+
+            resourceListItem.appendChild(resourceHeader);
+            resourceListItem.appendChild(resourceContent);
+
+            resourceList.appendChild(resourceListItem);
+        });
+
+        // Fetch route with selected resources
+        const submitButton = document.getElementById('submit-button');
+        submitButton.addEventListener('click', () => {
+            fetch('/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/member/{{member.id}}/allocate-resources', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(selectedResources),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response from server:', data);
+                    window.location.reload();
+                    switchTabs('members-content')
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // Remove allocated resource
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.classList.contains('remove-resource')) {
+                const resourceId = parseInt(e.target.getAttribute('data-resource-id'), 10); // Parse as integer
+                const index = selectedResources.findIndex(item => item.resource_id === resourceId);
+                console.log(index);
+                console.log('Clicked resource ID:', resourceId);
+                console.log('Selected resources:', selectedResources);
+
+                if (index !== -1) {
+                    fetch(`/dashboard/org/{{org.id}}/sub-org/{{sub_org.id}}/member/{{member.id}}/deallocate-resource/${resourceId}`, {
+                        method: 'POST',
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Server Response:', data);
+                            if (data === 'Resource removed successfully') {
+                                // Update the client-side data and interface
+                                selectedResources.splice(index, 1);
+                                e.target.textContent = 'Select';
+                                e.target.disabled = false;
+                            } else {
+                                console.error('Error:', data);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch Error:', error);
+                        });
+                }
+            }
+        });
+
+        // Search functionality
+        const resourceSearch = document.getElementById('resource-search');
+        const resourceCards = document.querySelectorAll('.resource-card');
+
+        resourceSearch.addEventListener('input', () => {
+            const searchTerm = resourceSearch.value.toLowerCase();
+            resourceCards.forEach(card => {
+                const title = card.querySelector('.text-zinc-900').textContent.toLowerCase();
+                if (title.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none'; // Fixed syntax error here
+                }
+            });
+        });
+    });
+
+    function openEditDialog(resourceId) {
+        const editDialog = document.getElementById('edit-dialog');
+        const resourceForm = document.getElementById('edit-resource-form');
+        const resourceInput = document.getElementById('edit-resource-quantity');
+        const saveButton = document.getElementById('edit-resource-save');
+        
+        // Populate the current quantity
+        const index = selectedResources.findIndex(item => item.resource_id === resourceId);
+        if (index !== -1) {
+            resourceInput.value = selectedResources[index].quantity;
+        } else {
+            resourceInput.value = 1; // Default value
+        }
+        
+        // Save the resourceId in the dialog for reference
+        resourceInput.dataset.resourceId = resourceId;
+        
+        // Show the edit dialog
+        editDialog.style.display = 'block';
+        
+        // Save the updated quantity when the user clicks save
+        saveButton.addEventListener('click', () => {
+            const newQuantity = parseInt(resourceInput.value, 10);
+            const resourceId = resourceInput.dataset.resourceId;
+            
+            if (!isNaN(newQuantity) && newQuantity > 0) {
+                // Update the selectedResources array with the new quantity
+                const index = selectedResources.findIndex(item => item.resource_id === resourceId);
+                if (index !== -1) {
+                    selectedResources[index].quantity = newQuantity;
+                }
+                
+                // Close the dialog
+                editDialog.style.display = 'none';
+                
+                // You can optionally update the display to show the new quantity here
+            } else {
+                alert('Please enter a valid quantity.');
+            }
+        });
+    }
+</script>
+</main>
+
+{% endblock content %}

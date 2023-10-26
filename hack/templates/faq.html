@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+    <div class="mx-auto max-w-screen-2xl px-4 md:px-8">
+        <div class="mb-10 md:mb-16">
+            <h2 class="mb-4 text-center text-2xl font-bold text-gray-800 md:mb-6 lg:text-3xl">Frequently asked questions</h2>
+            <p class="mx-auto max-w-screen-md text-center text-gray-500 md:text-lg">Have a question? Check out the FAQs.</p>
+        </div>
+
+        <div class="mx-auto flex max-w-screen-sm flex-col border-t">
+            <!-- Question 1 - start -->
+            <div class="border-b">
+                <div class="flex cursor-pointer justify-between gap-2 py-4 text-black hover:text-[#10172A] active:text-[#10172A]" onclick="toggleAnswer(this)">
+                    <span class="font-semibold transition duration-100 md:text-lg">What is Stratify, and how does it relate to the world of EVA units?</span>
+                    <span class="text-[#10172A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
+                </div>
+                <p class="mb-4 hidden text-gray-500">Stratify is a revolutionary software platform designed to help organizations efficiently manage their resources and branches. Just as EVA units combine human intelligence with immense mecha power, Stratify combines strategic human insights with cutting-edge technology. It unites the strengths of various organizational elements to prepare for the colossal and existential threats of the year 3023.</p>
+            </div>
+            <!-- Question 1 - end -->
+
+            <!-- Question 2 - start -->
+            <div class="border-b">
+                <div class="flex cursor-pointer justify between gap-2 py-4 text-black hover:text-[#10172A] active:text-[#10172A]" onclick="toggleAnswer(this)">
+                    <span class="font-semibold transition duration-100 md:text-lg">How can Stratify help our organization in these tumultuous times?</span>
+                    <span class="text-[#10172A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
+                </div>
+                <p class="mb-4 hidden text-gray-500">Stratify empowers organizations to bring unity and innovation to humanity's last stand. It offers tools and features that streamline resource management, strategic planning, and coordination across various branches. By using Stratify, you can optimize your operations, making your organization more agile and responsive to evolving challenges.</p>
+            </div>
+            <!-- Question 2 - end -->
+
+            <!-- Question 3 - start -->
+            <div class="border-b">
+                <div class="flex cursor-pointer justify-between gap-2 py-4 text-black hover:text-[#10172A] active:text-[#10172A]" onclick="toggleAnswer(this)">
+                    <span class="font-semibold transition duration-100 md:text-lg">Can Stratify be customized to meet the unique needs of our organization?</span>
+                    <span class="text-[#10172A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
+                </div>
+                <p class="mb-4 hidden text-gray-500">Absolutely! Stratify is designed to be flexible and adaptable. You can tailor it to suit the specific requirements and objectives of your organization. Whether you're a government agency, a corporation, or any other entity, Stratify's modular structure allows for customization to align with your goals.</p>
+            </div>
+            <!-- Question 3 - end -->
+
+            <!-- Question 4 - start -->
+            <div class="border-b">
+                <div class="flex cursor-pointer justify-between gap-2 py-4 text-black hover:text-[#10172A] active:text-[#10172A]" onclick="toggleAnswer(this)">
+                    <span class="font-semibold transition duration-100 md:text-lg">What kind of support and assistance can we expect with Stratify?</span>
+                    <span class="text-[#10172A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
+                </div>
+                <p class="mb-4 hidden text-gray-500">We understand the importance of support in times of crisis. Stratify provides dedicated support and training to help your team harness the full potential of the software. Our experts are available to guide you through setup, answer your questions, and address any issues that may arise, ensuring your organization operates efficiently and effectively.</p>
+            </div>
+            <!-- Question 4 - end -->
+
+            <!-- Question 5 - start -->
+            <div class="border-b">
+                <div class="flex cursor-pointer justify-between gap-2 py-4 text-black hover:text-[#10172A] active:text-[#10172A]" onclick="toggleAnswer(this)">
+                    <span class="font-semibold transition duration-100 md:text-lg">Does Stratify integrate with other software and systems?</span>
+                    <span class="text-[#10172A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
+                </div>
+                <p class="mb-4 hidden text-gray-500">Yes, Stratify is designed to be adaptable and compatible with a wide range of existing software and systems. Whether you need integration with communication tools, data analytics platforms, or other resources, we offer solutions to ensure seamless coordination between Stratify and your existing technology infrastructure.</p>
+            </div>
+            <!-- Question 5 - end -->
+
+            <!-- Question 6 - start -->
+            <div class="border-b">
+                <div class="flex cursor-pointer justify-between gap-2 py-4 text-black hover:text-[#10172A] active:text-[#10172A]" onclick="toggleAnswer(this)">
+                    <span class="font-semibold transition duration-100 md:text-lg">How can our organization get started with Stratify?</span>
+                    <span class="text-[#10172A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </span>
+                </div>
+                <p class="mb-4 hidden text-gray-500">Getting started with Stratify is a straightforward process. You can reach out to our team, and we'll guide you through the onboarding and implementation process. We'll work closely with you to ensure a smooth transition and provide training to empower your team with the tools they need to succeed.</p>
+            </div>
+            <!-- Question 6 - end -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleAnswer(element) {
+        const answer = element.nextElementSibling;
+        answer.classList.toggle("hidden");
+    }
+</script>
+{% endblock content %}
