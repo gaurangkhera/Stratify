@@ -13,7 +13,7 @@ login_manager.login_view = 'login'
 
 app.config['SECRET_KEY'] = 'secret'
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://vjtgjbnd:rhQmPAxyVugX_fkjdXwbGSgZscfxVBpa@rain.db.elephantsql.com/vjtgjbnd"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://psvalfba:E4U81Mw74o4RxkUMnJOw3h0-u8Dd3P_a@rain.db.elephantsql.com/psvalfba"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 Migrate(app,db)
